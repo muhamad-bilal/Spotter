@@ -1,0 +1,128 @@
+/* Design tokens.
+ *
+ * Direction: a dispatch console. This is a compliance instrument for a
+ * professional driver, so it reads as an industrial readout -- dense, precise,
+ * tabular -- rather than a consumer app. One accent colour (safety amber, the
+ * colour of the industry) carries all emphasis; red is reserved exclusively for
+ * errors so it never loses its meaning.
+ *
+ * Nothing outside this file should contain a raw colour.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Spacing: 4px base unit. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Type scale, ~1.25 ratio. */
+  --text-xs: 0.75rem;    /* 12px - small print, basis labels */
+  --text-sm: 0.8125rem;  /* 13px - secondary */
+  --text-base: 0.9375rem;/* 15px - body */
+  --text-lg: 1.125rem;   /* 18px - section headings */
+  --text-xl: 1.5rem;     /* 24px - page title */
+  --text-2xl: 2.25rem;   /* 36px - stat figures */
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono",
+    Menlo, Consolas, monospace;
+
+  --container: 1140px;
+  --transition: 120ms ease;
+
+  /* --- light ------------------------------------------------------------ */
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-sunken: #eef1f5;
+  --border: #d9dee5;
+  --border-strong: #b9c2cd;
+
+  --text: #0f151c;
+  --text-secondary: #46525f;
+  --text-muted: #6b7885;
+
+  --accent: #b45309;
+  --accent-strong: #92400e;
+  --accent-contrast: #ffffff;
+  --accent-subtle: #fdf3e7;
+  --accent-border: #edc9a3;
+
+  --danger: #b42318;
+  --danger-subtle: #fef3f2;
+  --danger-border: #f3c3bf;
+
+  --shadow-sm: 0 1px 2px rgb(16 21 28 / 0.06);
+  --shadow: 0 1px 3px rgb(16 21 28 / 0.09), 0 6px 16px -6px rgb(16 21 28 / 0.09);
+
+  /* Duty statuses. Fixed here so the phase-6 log grid inherits exactly these. */
+  --duty-off-duty: #64748b;
+  --duty-sleeper: #6d5bd0;
+  --duty-driving: #d97706;
+  --duty-on-duty: #2563eb;
+
+  /* Map stop kinds. Tied to the duty palette above wherever the meaning lines
+     up -- the two rests share the sleeper hue, fuel shares the driving amber --
+     so a reader who learns the log grid already knows the map. */
+  --stop-start: #475569;
+  --stop-pickup: #2563eb;
+  --stop-dropoff: #047857;
+  --stop-fuel: #d97706;
+  --stop-break_30: #0891b2;
+  --stop-rest_10: #6d5bd0;
+  --stop-restart_34: #9333ea;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c1017;
+    --surface: #141a23;
+    --surface-sunken: #1a212b;
+    --border: #262f3b;
+    --border-strong: #38434f;
+
+    --text: #e7edf4;
+    --text-secondary: #aab6c3;
+    --text-muted: #8391a0;
+
+    --accent: #f59e0b;
+    --accent-strong: #fbbf24;
+    --accent-contrast: #1a1206;
+    --accent-subtle: #241a0c;
+    --accent-border: #58400f;
+
+    --danger: #fda29b;
+    --danger-subtle: #2a1513;
+    --danger-border: #6b2b25;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 8px 20px -8px rgb(0 0 0 / 0.6);
+
+    --duty-off-duty: #94a3b8;
+    --duty-sleeper: #a394f0;
+    --duty-driving: #f59e0b;
+    --duty-on-duty: #60a5fa;
+
+    --stop-start: #94a3b8;
+    --stop-pickup: #60a5fa;
+    --stop-dropoff: #34d399;
+    --stop-fuel: #f59e0b;
+    --stop-break_30: #22d3ee;
+    --stop-rest_10: #a394f0;
+    --stop-restart_34: #c084fc;
+  }
+}

@@ -1,0 +1,201 @@
+.map {
+  position: relative;
+  border-block: 1px solid var(--border);
+}
+
+.map__canvas {
+  height: 420px;
+  width: 100%;
+  background: var(--surface-sunken);
+}
+
+@media (max-width: 640px) {
+  .map__canvas {
+    height: 320px;
+  }
+}
+
+/* OSM tiles are built for a light page. Rather than swapping in a second tile
+   provider, dark mode dims and desaturates them so the map sits in the theme
+   without glare. Deliberately not inverted -- inversion turns water and parkland
+   into colours that read wrong. */
+@media (prefers-color-scheme: dark) {
+  .map__canvas .leaflet-tile-pane {
+    filter: brightness(0.72) saturate(0.72) contrast(1.06);
+  }
+}
+
+/* --- route line ----------------------------------------------------------- */
+
+.route-line__casing {
+  stroke: #0b1017;
+  stroke-width: 7;
+  stroke-opacity: 0.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.route-line {
+  stroke: var(--accent);
+  stroke-width: 3.5;
+  stroke-opacity: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* --- pins ----------------------------------------------------------------- */
+
+.pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--pin-color, var(--text-muted));
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.45);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.pin--sm {
+  width: 18px;
+  height: 18px;
+  font-size: 8px;
+  border-width: 1.5px;
+  box-shadow: none;
+}
+
+.pin--start { --pin-color: var(--stop-start); }
+.pin--pickup { --pin-color: var(--stop-pickup); }
+.pin--dropoff { --pin-color: var(--stop-dropoff); }
+.pin--fuel { --pin-color: var(--stop-fuel); }
+.pin--break_30 { --pin-color: var(--stop-break_30); }
+.pin--rest_10 { --pin-color: var(--stop-rest_10); }
+.pin--restart_34 { --pin-color: var(--stop-restart_34); }
+
+/* --- legend --------------------------------------------------------------- */
+
+.map__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.legend {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend__label {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.map__note,
+.map__unavailable {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.map__unavailable {
+  text-align: center;
+  padding-block: var(--space-6);
+}
+
+/* --- popup ---------------------------------------------------------------- */
+
+.leaflet-popup-content-wrapper {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.leaflet-popup-tip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup-content {
+  margin: var(--space-3) var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--text-muted);
+}
+
+.popup__kind {
+  display: block;
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.popup__label {
+  display: block;
+  font-weight: var(--weight-medium);
+  margin-top: 2px;
+}
+
+.popup__times {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1px var(--space-3);
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+}
+
+.popup__times dt {
+  color: var(--text-muted);
+}
+
+.popup__times dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* Leaflet's own chrome, themed. */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: var(--surface-sunken);
+}
+
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-bottom-color: var(--border);
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.leaflet-control-attribution a {
+  color: var(--text-secondary);
+}

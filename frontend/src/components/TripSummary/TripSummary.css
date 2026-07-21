@@ -1,0 +1,132 @@
+.summary__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* --- stat row -------------------------------------------------------------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-5);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.stat__value {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.stat__unit {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  letter-spacing: 0;
+}
+
+.stat__foot {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.meter {
+  height: 5px;
+  margin-top: var(--space-2);
+  border-radius: 3px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.meter__fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+/* --- the two durations ----------------------------------------------------- */
+
+.durations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border);
+}
+
+.duration {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-sunken);
+}
+
+/* The HOS figure is the one that drives every log sheet, so it is visually
+   dominant and the provider ETA is deliberately quieter. */
+.duration--primary {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+}
+
+.duration__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.duration__value {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.duration__value--muted {
+  color: var(--text-secondary);
+  font-weight: var(--weight-medium);
+}
+
+.duration__basis {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* --- tag ------------------------------------------------------------------- */
+
+.tag {
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tag--accent {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-contrast);
+}

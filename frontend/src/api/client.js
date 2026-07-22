@@ -52,4 +52,9 @@ export async function postTrip(inputs) {
   return body
 }
 
+/** Where the printable multi-page log lives for a saved trip. */
+export function logsPdfUrl(tripId) {
+  return `${BASE_URL}/api/trips/${tripId}/logs.pdf`
+}
+
 export { BASE_URL }

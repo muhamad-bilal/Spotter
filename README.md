@@ -47,13 +47,24 @@ actionable 400 rather than a crash.
 python -m venv .venv
 .venv/Scripts/pip install -r backend/requirements.txt   # Linux/macOS: .venv/bin/pip
 
-cd backend && pytest              # 117 tests; live tests excluded by default
+cd backend && pytest              # live tests excluded by default
 cd backend && python manage.py check
-cd frontend && npm install && npm run dev
+
+# two dev servers, in separate terminals:
+cd backend  && python manage.py runserver 8000   # auto-reloads on backend edits
+cd frontend && npm install && npm run dev        # http://localhost:5173
 
 # optional, hits the real APIs:
 cd backend && ORS_API_KEY=your-key pytest -m live -v
 ```
+
+> **Comparing PDF output? Make sure the backend is serving current code.** Run
+> `manage.py runserver` **without** `--noreload` (as above) so backend edits are
+> picked up automatically. The frontend hot-reloads via Vite, but a backend
+> started with `--noreload` keeps serving the code it launched with -- which once
+> cost a debugging cycle when the on-screen SVG looked fixed while the downloaded
+> PDF was still stale. If a PDF ever disagrees with the on-screen sheet, restart
+> the backend first.
 
 ## Services
 

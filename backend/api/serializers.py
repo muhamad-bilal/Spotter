@@ -92,6 +92,7 @@ class TripSummarySerializer(serializers.ModelSerializer):
             "provider_eta_source",
             "total_days",
             "cycle_hours_remaining",
+            "resolved_locations",
         ]
 
     def get_drive_hours_basis(self, _trip) -> str:

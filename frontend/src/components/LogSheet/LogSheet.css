@@ -1,0 +1,237 @@
+/* One daily log sheet.
+ *
+ * The grid itself stays light and neutral like the printed form; only the
+ * duty-status trace carries colour, drawn from the same tokens as the map pins
+ * so a reader who learns one already knows the other.
+ */
+
+.sheets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.logs__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Secondary to the form's primary submit -- this is an export, not the
+   main action on the page. */
+.button--quiet {
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+  padding: 6px var(--space-3);
+  text-decoration: none;
+}
+
+.button--quiet:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.sheet__empty {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-align: center;
+  padding-block: var(--space-5);
+}
+
+/* Which colour means which duty status, stated once above the stack. */
+.duty-key {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.duty-key__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.duty-key__swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.sheet {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.sheet__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-sunken);
+}
+
+.sheet__date {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
+
+.sheet__meta {
+  display: flex;
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.sheet__meta dt {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.sheet__meta dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+/* The grid has a fixed aspect; on narrow screens it scrolls rather than
+   squashing, which would make the 15-minute ticks meaningless. */
+.sheet__scroll {
+  overflow-x: auto;
+  padding: var(--space-3) var(--space-4) var(--space-2);
+}
+
+.sheet__svg {
+  display: block;
+  width: 100%;
+  /* A legibility floor, NOT the viewBox width. The viewBox is 1028 wide; at the
+     full page width the scroll viewport works out to ~1008px, so flooring at
+     1028 would force a ~20px overflow and a scrollbar for a 2% scale difference.
+     940 keeps text at >=11px yet fits the full-width viewport with room to
+     spare, so the sheet only scrolls on genuinely narrow screens. */
+  min-width: 940px;
+  height: auto;
+}
+
+/* --- grid furniture -------------------------------------------------------- */
+
+.sheet__band {
+  fill: var(--surface);
+}
+
+.sheet__band--alt {
+  fill: var(--surface-sunken);
+}
+
+.sheet__rule {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.sheet__hour-line {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.sheet__hour-line--major {
+  stroke: var(--border-strong);
+}
+
+.sheet__tick {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.sheet__hour,
+.sheet__totals-caption,
+.sheet__remarks-caption {
+  fill: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+}
+
+.sheet__hour--major {
+  fill: var(--text-secondary);
+  font-weight: var(--weight-semibold);
+}
+
+.sheet__row-label {
+  fill: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+}
+
+.sheet__row-number {
+  fill: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: var(--weight-semibold);
+}
+
+/* --- the trace ------------------------------------------------------------- */
+
+.sheet__segment {
+  stroke-width: 3;
+  stroke-linecap: butt;
+}
+
+.sheet__segment--off_duty { stroke: var(--duty-off-duty); }
+.sheet__segment--sleeper  { stroke: var(--duty-sleeper); }
+.sheet__segment--driving  { stroke: var(--duty-driving); }
+.sheet__segment--on_duty  { stroke: var(--duty-on-duty); }
+
+/* Neutral so the eye reads the coloured horizontals as the data and the
+   verticals merely as the pen travelling between rows. */
+.sheet__connector {
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  opacity: 0.8;
+}
+
+/* --- totals ---------------------------------------------------------------- */
+
+.sheet__total {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  fill: var(--text-secondary);
+}
+
+.sheet__total--driving {
+  fill: var(--duty-driving);
+  font-weight: var(--weight-semibold);
+}
+
+.sheet__grand-total {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: var(--weight-semibold);
+  fill: var(--text);
+}
+
+/* --- remarks --------------------------------------------------------------- */
+
+.sheet__remark-stem {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.sheet__remark {
+  fill: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  /* Anchored at the start (lowest, left end); the label rises up to the right
+     from there and stays below the grid -- see remarkAnchorDepth. */
+  text-anchor: start;
+}

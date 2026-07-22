@@ -11,3 +11,5 @@ dist/
 .env.local
 
 .claude/
+
+CLAUDE.md

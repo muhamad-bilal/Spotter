@@ -143,6 +143,36 @@ def test_http_errors_become_readable_routing_errors(router, status, expected):
 
 
 @responses.activate
+def test_over_distance_limit_gives_a_human_message(router):
+    """Geoapify rejects trips over ~6,200 mi; the raw metres/async wording must
+    not leak -- the user gets miles instead."""
+    responses.get(
+        GEOAPIFY_URL,
+        status=400,
+        json={
+            "message": (
+                "Distance between locations is 12988523 meters which is greater "
+                "than 10000000 meters limit for the synchronous API. Please use "
+                "the asynchronous batch API call."
+            )
+        },
+    )
+    with pytest.raises(RoutingError) as exc:
+        router.route(WAYPOINTS)
+
+    message = str(exc.value)
+    assert "too long to route" in message
+    assert "8,071 miles" in message      # 12,988,523 m -> ~8,071 mi
+    assert "6,200 miles" in message      # the 10,000,000 m limit -> ~6,200 mi
+    # None of the raw, meaningless wording survives.
+    assert "meters" not in message
+    assert "async" not in message.lower()
+    assert "batch" not in message.lower()
+    # A distance limit is mode-independent, so it must not retry in drive mode.
+    assert len(responses.calls) == 1
+
+
+@responses.activate
 def test_provider_message_is_surfaced(router):
     responses.get(
         GEOAPIFY_URL, status=500, json={"message": "No path found between waypoints"}

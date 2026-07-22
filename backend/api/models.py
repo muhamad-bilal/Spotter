@@ -54,6 +54,10 @@ class Trip(models.Model):
     # reproduce its own payload: the map needs the route line back.
     geometry = models.JSONField(default=list, help_text="[[lat, lng], ...] polyline")
 
+    # The geocoder's resolved display name for each typed address, so the driver
+    # can see what "LA" or "NY" actually matched. {current, pickup, dropoff}.
+    resolved_locations = models.JSONField(default=dict, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

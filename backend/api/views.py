@@ -8,6 +8,7 @@ fake without any HTTP mocking, and so a future provider swap needs no change her
 """
 
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -18,6 +19,7 @@ from services import TripPlanningError, plan_route
 
 from .models import DutySegment, LogDay, RouteStop, Trip
 from .payload import build_logs, build_stops, build_trip_summary
+from .pdf import build_log_pdf
 from .serializers import TripRequestSerializer, TripResponseSerializer
 
 
@@ -58,6 +60,23 @@ def retrieve_trip(request, pk):
     return Response(TripResponseSerializer(trip).data)
 
 
+@api_view(["GET"])
+def trip_logs_pdf(request, pk):
+    """The daily logs as a printable multi-page PDF, one page per log day.
+
+    Drawn from the same persisted rows the JSON payload serialises -- the
+    schedule is never recomputed here.
+    """
+    trip = get_object_or_404(Trip, pk=pk)
+    pdf = build_log_pdf(trip)
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename="drivers-daily-log-trip-{trip.pk}.pdf"'
+    )
+    return response
+
+
 @transaction.atomic
 def _persist(inputs, routed, plan) -> Trip:
     summary = build_trip_summary(plan, routed)
@@ -73,6 +92,9 @@ def _persist(inputs, routed, plan) -> Trip:
         provider_eta_hours=summary["provider_eta_hours"],
         provider_eta_source=summary["provider_eta_source"],
         geometry=[[lat, lng] for lat, lng in routed.geometry],
+        # What the geocoder actually matched each typed address to, so the driver
+        # can tell whether "LA" resolved to the city they meant.
+        resolved_locations={key: place.label for key, place in routed.places.items()},
     )
 
     RouteStop.objects.bulk_create(

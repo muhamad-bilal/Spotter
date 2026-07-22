@@ -82,7 +82,38 @@ export default function TripSummary({ trip }) {
             <p className="duration__basis">{trip.provider_eta_source}</p>
           </div>
         </div>
+
+        <ResolvedLocations resolved={trip.resolved_locations} />
       </div>
     </section>
+  )
+}
+
+const RESOLVED_ORDER = [
+  ['current', 'Current'],
+  ['pickup', 'Pickup'],
+  ['dropoff', 'Dropoff'],
+]
+
+/* What the geocoder actually matched each typed address to. A bare "LA" or "NY"
+   resolves unpredictably, so showing the resolved name lets the driver catch a
+   wrong match before trusting the route. */
+function ResolvedLocations({ resolved }) {
+  if (!resolved || RESOLVED_ORDER.every(([key]) => !resolved[key])) return null
+
+  return (
+    <div className="resolved">
+      <p className="eyebrow">Resolved locations</p>
+      <dl className="resolved__list">
+        {RESOLVED_ORDER.map(([key, label]) =>
+          resolved[key] ? (
+            <div className="resolved__row" key={key}>
+              <dt>{label}</dt>
+              <dd title={resolved[key]}>{resolved[key]}</dd>
+            </div>
+          ) : null,
+        )}
+      </dl>
+    </div>
   )
 }

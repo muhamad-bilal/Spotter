@@ -130,3 +130,42 @@
   border-color: transparent;
   color: var(--accent-contrast);
 }
+
+/* --- resolved locations ---------------------------------------------------- */
+
+.resolved {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.resolved__list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.resolved__row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: var(--text-xs);
+}
+
+.resolved__row dt {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.resolved__row dd {
+  margin: 0;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

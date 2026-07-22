@@ -11,18 +11,18 @@ import './TripForm.css'
 const TEXT_FIELDS = [
   {
     name: 'current_location',
-    placeholder: 'Chicago, IL',
-    hint: 'Where the driver is right now',
+    placeholder: 'Los Angeles, CA',
+    hint: 'Where the driver is now. Use City, State — e.g. Los Angeles, CA.',
   },
   {
     name: 'pickup_location',
-    placeholder: 'Indianapolis, IN',
-    hint: 'Where the load is collected',
+    placeholder: 'Phoenix, AZ',
+    hint: 'Where the load is collected. Use City, State.',
   },
   {
     name: 'dropoff_location',
-    placeholder: 'Columbus, OH',
-    hint: 'Where the load is delivered',
+    placeholder: 'Dallas, TX',
+    hint: 'Where the load is delivered. Use City, State.',
   },
 ]
 

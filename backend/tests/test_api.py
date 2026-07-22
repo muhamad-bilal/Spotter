@@ -139,6 +139,15 @@ def test_stops_are_typed_positioned_and_ordered(client):
         assert stop["arrive_at"] <= stop["depart_at"]
 
 
+def test_resolved_locations_are_surfaced(client):
+    """The geocoder's matched names come back so a wrong 'LA'/'NY' is visible."""
+    trip = post(client).json()["trip"]
+    resolved = trip["resolved_locations"]
+    assert set(resolved) == {"current", "pickup", "dropoff"}
+    assert resolved["pickup"] == "Indianapolis, IN"
+    assert resolved["dropoff"] == "Columbus, OH"
+
+
 def test_geocoded_stops_use_their_real_coordinates(client):
     """Pickup and dropoff must sit on the geocoded address, not an interpolation."""
     stops = {s["kind"]: s for s in post(client).json()["route"]["stops"]}

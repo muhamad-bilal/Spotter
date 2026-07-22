@@ -10,6 +10,7 @@ GeoJSON coordinates arrive as [longitude, latitude] and are flipped to
 """
 
 import os
+import re
 from dataclasses import dataclass
 
 import requests
@@ -144,6 +145,10 @@ def _describe_failure(response: requests.Response) -> str:
 GEOAPIFY_URL = "https://api.geoapify.com/v1/routing"
 GEOAPIFY_TRUCK_MODE = "truck"
 GEOAPIFY_FALLBACK_MODE = "drive"
+# Geoapify's synchronous routing rejects trips longer than this. The raw
+# rejection talks about metres and an "asynchronous batch API call", which means
+# nothing to a driver, so we translate it into miles.
+GEOAPIFY_MAX_METRES = 10_000_000
 
 
 class GeoapifyRouter:
@@ -163,6 +168,9 @@ class GeoapifyRouter:
         self._api_key = api_key if api_key is not None else env.get("GEOAPIFY_API_KEY")
         self._mode = mode
         self._last_status: int | None = None
+        # A distance-limit rejection is the same in any mode, so it must not
+        # trigger the truck -> drive retry.
+        self._last_over_limit: bool = False
         # Records which mode actually produced the route: free plans do not
         # always allow the truck profile, and the caller deserves to know which
         # one it got rather than silently receiving car routing.
@@ -194,12 +202,13 @@ class GeoapifyRouter:
         except RoutingError:
             already_driving = self._mode == GEOAPIFY_FALLBACK_MODE
             mode_was_rejected = self._last_status == 400
-            if already_driving or not mode_was_rejected:
+            if already_driving or not mode_was_rejected or self._last_over_limit:
                 raise
         return self._get(waypoints, GEOAPIFY_FALLBACK_MODE), GEOAPIFY_FALLBACK_MODE
 
     def _get(self, waypoints: list[tuple[float, float]], mode: str) -> dict:
         self._last_status = None
+        self._last_over_limit = False
         try:
             response = requests.get(
                 GEOAPIFY_URL,
@@ -219,7 +228,9 @@ class GeoapifyRouter:
 
         self._last_status = response.status_code
         if response.status_code != 200:
-            raise RoutingError(_describe_geoapify_failure(response))
+            over_limit = _geoapify_over_limit_message(response)
+            self._last_over_limit = over_limit is not None
+            raise RoutingError(over_limit or _describe_geoapify_failure(response))
         try:
             return response.json()
         except ValueError as exc:
@@ -276,6 +287,41 @@ def _flatten_geoapify_geometry(geometry: dict) -> list[tuple[float, float]]:
             except (IndexError, TypeError, ValueError) as exc:
                 raise RoutingError("Routing service returned an unreadable route.") from exc
     return points
+
+
+def _geoapify_over_limit_message(response: requests.Response) -> str | None:
+    """Translate Geoapify's over-distance rejection into a message about miles.
+
+    Returns None if this failure is something else. The raw rejection reads like
+    "...N meters... greater than 10000000 meters limit... asynchronous batch API
+    call", none of which is meaningful to a driver.
+    """
+    try:
+        body = response.json()
+        raw = str(body.get("message") or body.get("error") or "")
+    except ValueError:
+        raw = ""
+
+    metres = [int(n) for n in re.findall(r"\d{6,}", raw)]
+    lowered = raw.lower()
+    over_limit = any(n >= GEOAPIFY_MAX_METRES for n in metres)
+    talks_async = "async" in lowered or "batch" in lowered
+    if not (over_limit or talks_async):
+        return None
+
+    limit_miles = round(GEOAPIFY_MAX_METRES / METRES_PER_MILE / 100) * 100  # ~6,200
+    attempted = max((n for n in metres if n >= GEOAPIFY_MAX_METRES), default=None)
+    if attempted is not None:
+        miles = attempted / METRES_PER_MILE
+        return (
+            f"This trip is too long to route (about {miles:,.0f} miles). The routing "
+            f"service supports trips up to roughly {limit_miles:,.0f} miles. "
+            f"Try a shorter route."
+        )
+    return (
+        f"This trip is too long to route. The routing service supports trips up to "
+        f"roughly {limit_miles:,.0f} miles. Try a shorter route."
+    )
 
 
 def _describe_geoapify_failure(response: requests.Response) -> str:

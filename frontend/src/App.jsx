@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { postTrip } from './api/client.js'
-import Placeholder from './components/Placeholder/Placeholder.jsx'
+import LogSheetList from './components/LogSheet/LogSheetList.jsx'
 import RouteMap from './components/RouteMap/RouteMap.jsx'
 import TripForm from './components/TripForm/TripForm.jsx'
 import TripSummary from './components/TripSummary/TripSummary.jsx'
@@ -53,14 +53,6 @@ export default function App() {
             <>
               <TripSummary trip={result.trip} />
               <RouteMap route={result.route} />
-              <Placeholder
-                title="Daily log sheets"
-                phase="logs"
-                lines={4}
-                description={`${result.logs.length} duty-status ${
-                  result.logs.length === 1 ? 'grid' : 'grids'
-                } will be drawn here, one per calendar day.`}
-              />
             </>
           ) : (
             <section className="card empty">
@@ -77,6 +69,14 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* The log sheets are the headline output, so they get the full page width
+          instead of being squeezed into the results column beside the form. */}
+      {result && (
+        <section className="app__logs">
+          <LogSheetList logs={result.logs} tripId={result.trip.id} />
+        </section>
+      )}
 
       <footer className="app__footer">
         Drive time assumes a constant 55&nbsp;mph. Fuel stop every 1,000&nbsp;miles;

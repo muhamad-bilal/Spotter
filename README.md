@@ -33,9 +33,14 @@ still run.
 | `NOMINATIM_USER_AGENT` | geocoding | Nominatim's usage policy requires a descriptive agent; requests without one are blocked. Falls back to a sane default. |
 
 Copy `backend/.env.example` to `backend/.env` for local use (gitignored); set real environment
-variables on Render/Railway in production. `services/env.py` reads the file without adding a
+variables on Render in production. `services/env.py` reads the file without adding a
 dependency, and a real environment variable always beats a stale local one, so a deployment
-value is never overwritten.
+value is never overwritten. Deployment steps live in [DEPLOY.md](DEPLOY.md).
+
+> **Production data is ephemeral.** The deployed backend keeps SQLite on Render's ephemeral
+> filesystem: saved trips are demo records and reset on every deploy or restart. The free
+> instance also spins down after ~15 minutes idle with a 30–60 s cold start — warm it with one
+> request before demoing.
 
 Whichever key is present decides the provider — deployment is an environment change, not a code
 change. With neither, `default_router()` still returns a router, so the failure is the usual

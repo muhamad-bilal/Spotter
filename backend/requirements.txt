@@ -1,8 +1,14 @@
+# Runtime -- everything the deployed service imports. All pinned so Render
+# builds exactly what was tested locally.
 Django==5.2.16
 djangorestframework==3.17.1
 django-cors-headers==4.9.0
 requests==2.34.2
 reportlab==5.0.0
+gunicorn==26.0.0
+whitenoise==6.12.0
+
+# Test-only (harmless in the production image, kept for one-file simplicity).
 pytest==9.1.1
 pytest-django==4.12.0
 responses==0.26.2

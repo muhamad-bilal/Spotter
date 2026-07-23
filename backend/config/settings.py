@@ -16,28 +16,52 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Local development reads backend/.env (gitignored); production reads real
+# environment variables, which always win over the file. The loader is a no-op
+# when no .env exists -- the Render case.
+from services.env import load_env_file  # noqa: E402  (Django-free module)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$5uavt!pj25s^!_q-y(a$7--30vrglyi-km&h#6_bwhnh%!d29'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+load_env_file()
 
 
-# CORS. The Vite dev server runs on 5173; the deployed Vercel origin is added
-# via an env var so production needs no code change.
+# Configuration comes from the environment so the same code runs locally and on
+# Render. Production values are set in Render's dashboard, never committed.
+
+# The fallback is for local development only; Render must set SECRET_KEY.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-$5uavt!pj25s^!_q-y(a$7--30vrglyi-km&h#6_bwhnh%!d29',
+)
+
+# Off unless explicitly switched on. Local dev sets DEBUG=true in backend/.env.
+DEBUG = os.environ.get('DEBUG', 'false').strip().lower() in ('1', 'true', 'yes')
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
+
+# Render injects its public hostname; picking it up here means deploying needs
+# no manual ALLOWED_HOSTS value. The CSRF and proxy settings make admin logins
+# work behind Render's TLS-terminating proxy.
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS = [f'https://{RENDER_EXTERNAL_HOSTNAME}']
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+# CORS. The Vite dev origins are always allowed; the deployed Vercel URL is
+# added via CORS_ALLOWED_ORIGINS (comma-separated) without a code change.
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+] + [
+    origin.strip()
+    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
 ]
-if os.environ.get('FRONTEND_ORIGIN'):
-    CORS_ALLOWED_ORIGINS.append(os.environ['FRONTEND_ORIGIN'])
-    ALLOWED_HOSTS.append('.onrender.com')
 
 
 # Application definition
@@ -57,6 +81,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # Serves collected static files (admin, DRF browsable API) straight from
+    # Django in production -- no separate static host needed on Render.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -136,6 +163,17 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # `collectstatic` target; whitenoise serves it
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        # Hashed filenames + compression, so far-future caching is safe.
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

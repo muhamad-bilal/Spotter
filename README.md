@@ -9,14 +9,14 @@ The hard part is the Hours-of-Service simulation: turning a route into a legally
 sequence of duty statuses (11-hour driving limit, 14-hour window, 30-minute break, 70/8 cycle),
 then slicing that sequence across midnight into individual log sheets.
 
-- **Live demo:** _<add your Vercel URL>_
-- **Repository:** _<add your GitHub URL>_
+- **Live demo:** _https://spotter-six-wine.vercel.app_
 
 ## Screenshots
 
-_<app screenshot: form + route map + summary>_
+<img width="1819" height="962" alt="image" src="https://github.com/user-attachments/assets/e6cb7007-7110-4e39-b65f-4d2014010cce" />
+<img width="1102" height="546" alt="image" src="https://github.com/user-attachments/assets/80c61fed-7e4f-4a14-8078-7733097b1b5f" />
 
-_<log sheet screenshot: the 24-hour duty-status grid>_
+
 
 ## Tech stack
 

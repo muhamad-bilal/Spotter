@@ -53,13 +53,13 @@ flowchart LR
 
     subgraph External["Free external APIs"]
         Nom["Nominatim — geocode"]
-        ORS["OpenRouteService — route geometry + distance"]
+        Geo2["Geoapify — route geometry + distance"]
         OSM["OSM tiles — map display"]
     end
 
     Form -->|trip inputs| API
     API --> Geo --> Nom
-    API --> Route --> ORS
+    API --> Route --> Geo2
     Route --> HOS --> LogGen --> API
     API -->|route + daily logs JSON| MapView
     API --> Logs
@@ -81,7 +81,7 @@ frontend renders.
 | Backend framework | **Django + Django REST Framework** | Required by the brief. DRF gives me clean serializers and a browsable API, which will demo well in the Loom. |
 | Frontend | **React (Vite)** | Required. Vite over CRA — faster, and deploys cleanly to Vercel. |
 | Map display | **react-leaflet + OpenStreetMap tiles** | Free, no API key, no billing. Draws polylines and markers easily. |
-| Routing (distance, duration, geometry) | **OpenRouteService** | Free API key, returns route geometry + distance + duration. Has an HGV (truck) profile, which should read well in the Loom. |
+| Routing (distance, duration, geometry) | **Geoapify** (default), OpenRouteService supported | Free API key, returns route geometry + distance + duration on a truck profile, which reads well in the Loom. Both providers sit behind one service interface so swapping is an env change. |
 | Geocoding (address → lat/lng) | **Nominatim** | Free. I need to respect the 1 req/sec limit and cache results. |
 | Backend hosting | **Render** or **Railway** free tier | Vercel doesn't host long-running Django well, so I'll host the API separately and point the frontend at it. |
 | Frontend hosting | **Vercel** | What the brief suggests. Only the React app lives here. |
@@ -93,7 +93,7 @@ frontend renders.
 
 ### Backup APIs, in case one rate-limits me mid-demo
 
-- Routing: OSRM public demo server, or Geoapify routing (free tier).
+- Routing: OpenRouteService (supported as a second provider), or OSRM public demo server.
 - Geocoding: Geoapify or LocationIQ free tier.
 
 I'll keep the routing and geocoding calls behind my own service classes so swapping providers is
@@ -356,7 +356,7 @@ Things I don't want to skip, because they're cheap and they're what gets judged:
 ## 9. Deployment
 
 1. **Backend → Render/Railway.** Set `ALLOWED_HOSTS`, `DEBUG=False`, database URL, and the
-   OpenRouteService API key as env vars. Add `django-cors-headers` and allow the Vercel origin.
+   Geoapify API key as env vars. Add `django-cors-headers` and allow the Vercel origin.
 2. **Frontend → Vercel.** Set `VITE_API_BASE_URL` to the Render URL. Build with Vite.
 3. **Smoke test the hosted pair** end-to-end before recording — cold-start free tiers can be slow
    on first request, so hit it once to warm it right before the Loom.
@@ -369,7 +369,7 @@ Doing it in this order so I always have something demoable:
 
 1. **HOS engine in isolation** — pure functions, no Django, with the §6 tests. This is the risky
    part; nail it first with hardcoded distances.
-2. **Routing + geocoding services** — wrap OpenRouteService + Nominatim behind service classes.
+2. **Routing + geocoding services** — wrap Geoapify + Nominatim behind service classes.
 3. **Django API** — wire services + engine into `POST /api/trips/`, return the §5 payload.
 4. **React form + summary** — get a round trip working with plain output.
 5. **RouteMap** — draw the polyline and markers.

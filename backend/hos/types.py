@@ -21,7 +21,7 @@ StopKind = Literal[
 
 @dataclass(frozen=True)
 class Leg:
-    """One routed hop. `distance_miles` is hardcoded in phase 1, ORS-supplied later."""
+    """One routed hop. `distance_miles` comes from the routing provider (Geoapify)."""
 
     distance_miles: float
     end_action: Literal["pickup", "dropoff"] | None = None

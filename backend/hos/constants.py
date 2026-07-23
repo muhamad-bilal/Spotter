@@ -28,8 +28,8 @@ DROPOFF_MIN = 60
 # Distance -> drive time. We use a fixed average speed rather than the routing
 # API's `duration`. Reason: the same distance must always produce the same log.
 # A live traffic-aware duration would make the reviewer's run disagree with the
-# recorded demo. OpenRouteService's duration is still surfaced for display in a
-# later phase, but the HOS math never depends on it.
+# recorded demo. The routing provider's duration is still surfaced for display,
+# but the HOS math never depends on it.
 AVG_SPEED_MPH = 55.0
 
 # Fuel-stop duration. The brief mandates fueling at least every 1000 miles but

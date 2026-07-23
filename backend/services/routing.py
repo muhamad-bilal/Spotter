@@ -1,4 +1,8 @@
-"""Coordinates -> route, via OpenRouteService's heavy-goods-vehicle profile.
+"""Coordinates -> route, on a truck profile.
+
+Two providers behind one interface, `route(waypoints) -> RouteResult`: Geoapify
+(the default) and OpenRouteService (used when only its key is present). A shared
+contract test runs against both. `default_router()` picks by which key is set.
 
 One request carries all three waypoints, so a trip costs a single call and comes
 back with one continuous geometry plus one segment per leg -- which is exactly the

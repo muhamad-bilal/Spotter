@@ -91,7 +91,6 @@ cd frontend && npm install && npm run dev                # http://localhost:5173
 | `NOMINATIM_USER_AGENT` | geocoding — a descriptive agent (Nominatim's policy requires it) |
 | `DEBUG` | set `true` for local development; unset in production |
 
-Production deployment (Render + Vercel) is documented in **[DEPLOY.md](DEPLOY.md)**.
 
 ## Testing
 
